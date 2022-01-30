@@ -4,8 +4,6 @@ const { joinVoiceChannel, createAudioPlayer, createAudioResource, entersState, A
 const { token } = require("./config.json");
 
 let text_channel_id = "936922604894289960";
-let voice_channel_id = "936935106290004019";
-let guild_id = "153847445153906688";
 let connection;
 let player;
 let resource;
@@ -20,21 +18,26 @@ client.on('messageCreate', msg => {
     
     if (msg.content === 'ping') {
         msg.reply('pong!');
-        console.log(msg.editable)
     }
     else if (msg.content === "join"){
-        connection = joinVoiceChannel({
-            channelId: voice_channel_id,
-            guildId: msg.guildId,
-            adapterCreator: msg.channel.guild.voiceAdapterCreator,
-        });
-        client.channels.cache.get(text_channel_id).send("Joining voice channel...");
+        if (msg.member.voice.channel){
+            connection = joinVoiceChannel({
+                channelId: msg.member.voice.channelId,
+                guildId: msg.guildId,
+                adapterCreator: msg.channel.guild.voiceAdapterCreator,
+            });
+            client.channels.cache.get(text_channel_id).send("Joining voice channel...");
         
-        resource = createAudioResource('./rick.mp3');
-        player = createAudioPlayer();
-        connection.subscribe(player);
-        player.play(resource);
-        console.log("Playback has started!");
+            resource = createAudioResource('./rick.mp3');
+            player = createAudioPlayer();
+            connection.subscribe(player);
+            player.play(resource);
+            console.log("Playback has started!");
+        }
+        else {
+            client.channels.cache.get(text_channel_id).send("You have to be in a voice channel to start the bot...");
+        }
+        
     }
     else if (msg.content === "leave"){
         connection.destroy();
