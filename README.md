@@ -1,0 +1,2 @@
+# BarnoBot
+Discord Bot
