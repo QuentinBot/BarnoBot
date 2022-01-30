@@ -16,6 +16,8 @@ client.on('ready', () => {
 
 client.on('messageCreate', msg => {
     
+    if (msg.channelId != text_channel_id) return;
+
     if (msg.content === 'ping') {
         msg.reply('pong!');
     }
