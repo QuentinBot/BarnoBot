@@ -25,7 +25,7 @@ client.on('messageCreate', msg => {
     else if (msg.content === "join"){
         connection = joinVoiceChannel({
             channelId: voice_channel_id,
-            guildId: guild_id,
+            guildId: msg.guildId,
             adapterCreator: msg.channel.guild.voiceAdapterCreator,
         });
         client.channels.cache.get(text_channel_id).send("Joining voice channel...");
