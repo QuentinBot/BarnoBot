@@ -41,7 +41,7 @@ client.on('messageCreate', msg => {
         }
         
     }
-    else if (msg.content === "leave"){
+    else if (connection && msg.content === "leave"){
         connection.destroy();
         client.channels.cache.get(text_channel_id).send("Leaving voice channel...");
     }
