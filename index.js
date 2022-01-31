@@ -3,7 +3,9 @@ const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, entersState, AudioPlayerStatus, getVoiceConnections } = require('@discordjs/voice');
 const { token } = require("./config.json");
 
+//temporary(?) for bot startup message
 let text_channel_id = "936922604894289960";
+
 let connection;
 let player;
 let resource;
@@ -11,13 +13,13 @@ let resource;
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
     client.user.setActivity(client.guilds.cache.size +' server', { type: "WATCHING" });
+    
+    // temporary, making sure the bot starts up
     client.channels.cache.get(text_channel_id).send("The bot is online and ready to help!");
 });
 
 client.on('messageCreate', msg => {
     
-    if (msg.channelId != text_channel_id) return;
-
     if (msg.content === 'ping') {
         msg.reply('pong!');
     }
@@ -28,7 +30,7 @@ client.on('messageCreate', msg => {
                 guildId: msg.guildId,
                 adapterCreator: msg.channel.guild.voiceAdapterCreator,
             });
-            client.channels.cache.get(text_channel_id).send("Joining voice channel...");
+            msg.channel.send("Joining voice channel...");
         
             resource = createAudioResource('./rick.mp3');
             player = createAudioPlayer();
@@ -37,13 +39,13 @@ client.on('messageCreate', msg => {
             console.log("Playback has started!");
         }
         else {
-            client.channels.cache.get(text_channel_id).send("You have to be in a voice channel to start the bot...");
+            msg.channel.send("You have to be in a voice channel to start the bot...");
         }
         
     }
     else if (connection && msg.content === "leave"){
         connection.destroy();
-        client.channels.cache.get(text_channel_id).send("Leaving voice channel...");
+        msg.channel.send("Leaving voice channel...");
     }
 });
 
