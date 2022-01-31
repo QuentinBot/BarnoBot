@@ -1,6 +1,6 @@
 const { Client, Intents } = require('discord.js');
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES] });
-const { joinVoiceChannel, createAudioPlayer, createAudioResource, entersState, AudioPlayerStatus, getVoiceConnections } = require('@discordjs/voice');
+const { joinVoiceChannel, createAudioPlayer, createAudioResource } = require('@discordjs/voice');
 const { token } = require("./config.json");
 
 //temporary(?) for bot startup message
@@ -20,6 +20,11 @@ client.on('ready', () => {
 
 client.on('messageCreate', msg => {
     
+    if (!msg.guild.me.permissionsIn(msg.channel).has("SEND_MESSAGES")) {
+        if (msg.guild.me.permissionsIn(msg.channel).has("ADD_REACTIONS")) msg.react("♿");
+        return; 
+    };
+
     if (msg.content === 'ping') {
         msg.reply('pong!');
     }
@@ -43,7 +48,7 @@ client.on('messageCreate', msg => {
         }
         
     }
-    else if (connection && msg.content === "leave"){
+    else if (msg.content === "leave" && connection && connection.state.status != "destroyed"){
         connection.destroy();
         msg.channel.send("Leaving voice channel...");
     }
