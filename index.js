@@ -61,6 +61,9 @@ client.on('interactionCreate', async interaction => {
         }
         
     }
+    else if (commandName === "help"){
+        interaction.reply("Start by typing /, then look for a command that piques your interest")
+    }
 });
 
 client.login(token);
