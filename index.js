@@ -1,11 +1,15 @@
-const { Client, Intents } = require('discord.js');
+const fs = require("fs");
+const { Client, Collection, Intents } = require('discord.js');
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES] });
-const { joinVoiceChannel, createAudioPlayer, createAudioResource } = require('@discordjs/voice');
 const { token } = require("./config.json");
 
-let connection;
-let player;
-let resource;
+client.commands = new Collection();
+const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".js"));
+
+for (const file of commandFiles) {
+    const command = require(`./commands/${file}`);
+    client.commands.set(command.data.name, command);
+}
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -15,55 +19,22 @@ client.on('ready', () => {
 client.on('interactionCreate', async interaction => {
     if (!interaction.isCommand()) return;
 
-    const { commandName } = interaction;
+    const command = client.commands.get(interaction.commandName);
+
+    if (!command) return;
 
     if (!interaction.guild.me.permissionsIn(interaction.channel).has("SEND_MESSAGES")) {
         if (interaction.guild.me.permissionsIn(interaction.channel).has("ADD_REACTIONS")) interaction.reply("♿ Please use the Botchannel... ♿");
         return; 
     };
 
-    if (commandName === 'ping') {
-        await interaction.reply('pong!');
+    try {
+        await command.execute(interaction);
+    } catch (e) {
+        console.error(e);
+        await interaction.reply({ content : "There was an error while executing this command!", ephemeral : true });
     }
-    else if (commandName === "server"){
-        await interaction.reply(`Server name: ${interaction.guild.name}\nTotal members: ${interaction.guild.memberCount}`);
-    }
-    else if (commandName === "user"){
-        await interaction.reply(`Your tag: ${interaction.user.tag}\nYour id: ${interaction.user.id}`);
-    }
-    else if (commandName === "join"){
-        if (interaction.member.voice.channel){
-            connection = joinVoiceChannel({
-                channelId: interaction.member.voice.channelId,
-                guildId: interaction.guildId,
-                adapterCreator: interaction.channel.guild.voiceAdapterCreator,
-            });
-            interaction.reply("Joining voice channel...");
-        
-            resource = createAudioResource('./rick.mp3');
-            player = createAudioPlayer();
-            connection.subscribe(player);
-            player.play(resource);
-            console.log("Playback has started!");
-        }
-        else {
-            interaction.reply("ERROR: You have to be in a voice channel to start the bot...");
-        }
-        
-    }
-    else if (commandName === "leave"){
-        if (connection && connection.state.status != "destroyed"){
-            interaction.reply("Leaving voice channel...");
-            connection.destroy();
-        }
-        else {
-            interaction.reply("ERROR: Connection has to be established first...")
-        }
-        
-    }
-    else if (commandName === "help"){
-        interaction.reply("Start by typing /, then look for a command that piques your interest")
-    }
+
 });
 
 client.login(token);
