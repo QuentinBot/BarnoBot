@@ -25,6 +25,12 @@ module.exports = {
                     guildId: interaction.guildId,
                     adapterCreator: interaction.channel.guild.voiceAdapterCreator,
                 });
+                player = createAudioPlayer();
+                player.addListener("stateChange", (oldOne, newOne) => {
+                    if (newOne.status == "idle"){
+                        interaction.channel.send("Song finished");
+                    }
+                });
                 // ignore for now, add queue later!!
                 queue = []; 
                 interaction.channel.send("Joining voice channel...");
@@ -33,9 +39,9 @@ module.exports = {
             const song = await ytdl(songname, { filter : "audioonly" })
 
             resource = createAudioResource(song);
-            player = createAudioPlayer();
             connection.subscribe(player);
-            player.play(resource);
+            player.play(resource)
+
             console.log("Playback has started!");
         }
         else {
