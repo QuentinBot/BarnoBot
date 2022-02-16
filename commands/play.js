@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { joinVoiceChannel, createAudioPlayer, createAudioResource } = require('@discordjs/voice');
 const ytdl = require("ytdl-core");
-const ytSearch = require("yt-search");
+const yts = require("yt-search");
 
 
 module.exports = {
@@ -35,8 +35,10 @@ module.exports = {
                 queue = []; 
                 interaction.channel.send("Joining voice channel...");
             }
-
-            const song = await ytdl(songname, { filter : "audioonly" })
+            
+            song_url = (await yts(songname)).videos[0].url;
+            const song = await ytdl(song_url, { filter : "audioonly" });
+            interaction.channel.send(`Playing song ${song_url}`);
 
             resource = createAudioResource(song);
             connection.subscribe(player);
