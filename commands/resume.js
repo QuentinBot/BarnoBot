@@ -5,12 +5,12 @@ module.exports = {
         .setName("resume")
         .setDescription("Resumes the current audio"),
     async execute(interaction) {
-        if (typeof connection !== "undefined" && connection.state.status != "destroyed"){
-            interaction.reply("Resuming audio...");
-            player.unpause();
+        if (typeof player === "undefined" || player.state.status != "paused"){
+            interaction.reply("ERROR: Audio needs to be playing first...")
         }
         else {
-            interaction.reply("ERROR: Audio needs to be playing first...")
+            interaction.reply("Resuming audio...");
+            player.unpause();
         }
     },
 };
