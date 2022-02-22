@@ -29,7 +29,7 @@ module.exports = {
                 player.addListener("stateChange", (oldOne, newOne) => {
                     if (newOne.status == "idle"){
                         interaction.channel.send("Song finished");
-                        this.play();
+                        this.play(interaction);
                     }
                 });
                 connection.subscribe(player);
@@ -38,18 +38,18 @@ module.exports = {
             }
             queue.push(songname);
             interaction.channel.send(`Added ${songname} to the queue`);
-            if (player.state.status === "idle") this.play();
+            if (player.state.status === "idle") this.play(interaction);
         }
         else {
             interaction.reply("ERROR: You have to be in a voice channel to start the bot...");
         }
         
     },
-    async play(){
+    async play(interaction){
         if (queue.length == 0) return;
         songname = queue.shift();
         song_url = (await yts(songname)).videos[0].url;
-        console.log("Playing next song")
+        interaction.channel.send(`Now playing ${song_url}`);
         const song = await ytdl(song_url, { filter : "audioonly" });
 
         resource = createAudioResource(song);
