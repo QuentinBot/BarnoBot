@@ -2,7 +2,6 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 const { joinVoiceChannel, createAudioPlayer, createAudioResource } = require('@discordjs/voice');
 const ytdl = require("ytdl-core");
 const yts = require("yt-search");
-let connection;
 let queue = [];
 
 module.exports = {
@@ -14,8 +13,8 @@ module.exports = {
             option.setName("songname")
                 .setDescription("The name of the song you want to play")
                 .setRequired(true)),
+
     async execute(interaction) {
-        
         
         if (interaction.member.voice.channel){
             let songname = interaction.options.getString("songname");
@@ -46,7 +45,6 @@ module.exports = {
         }
         
     },
-    connection : connection,
 };
 async function play(){
     if (queue.length == 0) return;
